@@ -1,0 +1,17 @@
+{
+  "name": "TippingBucketCounter",
+  "description": "A library to read values from a binary counter via parallel communication on ESP32. Assumes connection to specific GPIOs.",
+  "keywords": ["tipping bucket", "rain gauge", "counter", "ESP32", "GPIO"],
+  "authors": [
+    {
+      "email": "andotoecno@gmail.com",
+      "maintainer": true,
+      "name": "Yusaku Nakajima"
+    }
+  ],
+  "repository": {},
+  "version": "1.0.0",
+  "license": "MIT",
+  "frameworks": ["arduino"],
+  "platforms": ["espressif32"]
+}

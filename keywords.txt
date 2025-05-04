@@ -1,0 +1,41 @@
+#######################################
+# Syntax Coloring Map For TippingBucketCounter
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+TippingBucketCounter	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+begin	KEYWORD2
+take_count	KEYWORD2
+count_clear	KEYWORD2
+calculate_volume	KEYWORD2
+debug	KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+BUCKET_COUNTER_PORT_NUM_A	LITERAL1
+BUCKET_COUNTER_PORT_NUM_B	LITERAL1
+BUCKET_COUNTER_PORT_NUM_C	LITERAL1
+BUCKET_COUNTER_PORT_NUM_D	LITERAL1
+BUCKET_COUNTER_PORT_NUM_E	LITERAL1
+BUCKET_COUNTER_PORT_NUM_F	LITERAL1
+BUCKET_COUNTER_PORT_NUM_G	LITERAL1
+BUCKET_COUNTER_PORT_NUM_H	LITERAL1
+BUCKET_COUNTER_PORT_NUM_CCK	LITERAL1
+BUCKET_COUNTER_PORT_NUM_CCLR	LITERAL1
+PORT_A_INDEX	LITERAL1
+PORT_B_INDEX	LITERAL1
+PORT_C_INDEX	LITERAL1
+PORT_D_INDEX	LITERAL1
+PORT_E_INDEX	LITERAL1
+PORT_F_INDEX	LITERAL1
+PORT_G_INDEX	LITERAL1
+PORT_H_INDEX	LITERAL1
+PORT_CCK_INDEX	LITERAL1
+PORT_CCLR_INDEX	LITERAL1
