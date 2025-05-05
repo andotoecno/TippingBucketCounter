@@ -45,7 +45,7 @@ void TippingBucketCounter::count_clear()
   pinMode(_binary_counter_ports[PORT_CCK_INDEX], INPUT);
 }
 
-void TippingBucketCounter::calculate_volume()
+void TippingBucketCounter::calculate_volume(float bucket_volume_ml)
 {
   volume_since_last_time = (float)difference_counts * bucket_volume_ml;
   total_volume = ((float)whole_counts_ + (float)overflow_counts_ * 256.0) * bucket_volume_ml;

@@ -45,12 +45,11 @@ class TippingBucketCounter
     int16_t difference_counts = 0;
     float volume_since_last_time = 0;
     float total_volume = 0;
-    float bucket_volume_ml = 0; // ml of once
 
     void begin(int16_t , uint8_t );
     void take_count();
     void count_clear();
-    void calculate_volume();
+    void calculate_volume(float bucket_volume_ml);
     void debug();
 };
 
