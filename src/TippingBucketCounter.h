@@ -2,6 +2,7 @@
 #define TIPPING_BUCKET_COUNTER_H
 
 #include <Arduino.h>
+#include "driver/pcnt.h"
 
 //ver3.0
 #define BUCKET_COUNTER_PORT_NUM_A 14
@@ -16,7 +17,8 @@
 #define BUCKET_COUNTER_PORT_NUM_CCLR 19
 
 #define BUCKET_MAX_VOLUME_ML 50
-
+#define BUCKET_COUNTER_MAX_COUNT 255
+#define NUMBER_OF_GPIO 10
 enum
 {
   PORT_A_INDEX,
@@ -31,12 +33,19 @@ enum
   PORT_CCLR_INDEX,
 };
 
+enum {
+  MODE_BINARY_COUNTER,
+  MODE_PULSE_COUNTER,
+};
+
 class TippingBucketCounter
 {
   private:
   uint16_t i = 0;
   const int _counter_bits = 8;
-  const uint8_t _binary_counter_ports[10] = {BUCKET_COUNTER_PORT_NUM_A, BUCKET_COUNTER_PORT_NUM_B, BUCKET_COUNTER_PORT_NUM_C, BUCKET_COUNTER_PORT_NUM_D, BUCKET_COUNTER_PORT_NUM_E, BUCKET_COUNTER_PORT_NUM_F, BUCKET_COUNTER_PORT_NUM_G, BUCKET_COUNTER_PORT_NUM_H, BUCKET_COUNTER_PORT_NUM_CCK, BUCKET_COUNTER_PORT_NUM_CCLR};
+  const int _number_of_GPIO = 10;
+  int count_mode = MODE_BINARY_COUNTER;
+  uint8_t _binary_counter_ports[NUMBER_OF_GPIO] = {BUCKET_COUNTER_PORT_NUM_A, BUCKET_COUNTER_PORT_NUM_B, BUCKET_COUNTER_PORT_NUM_C, BUCKET_COUNTER_PORT_NUM_D, BUCKET_COUNTER_PORT_NUM_E, BUCKET_COUNTER_PORT_NUM_F, BUCKET_COUNTER_PORT_NUM_G, BUCKET_COUNTER_PORT_NUM_H, BUCKET_COUNTER_PORT_NUM_CCK, BUCKET_COUNTER_PORT_NUM_CCLR};
 
   public:
     int16_t whole_counts_ = 0;
@@ -46,9 +55,12 @@ class TippingBucketCounter
     float volume_since_last_time = 0;
     float total_volume = 0;
 
-    void begin(int16_t , uint8_t );
+    void begin(int16_t , uint8_t);
+    void begin(int16_t , uint8_t, uint8_t, pcnt_unit_t);
     void take_count();
+    void take_count(pcnt_unit_t);
     void count_clear();
+    void count_clear(pcnt_unit_t);
     void calculate_volume(float bucket_volume_ml);
     void debug();
 };
