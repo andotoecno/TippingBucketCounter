@@ -25,7 +25,7 @@ void TippingBucketCounter::begin(int16_t kept_whole_counts_last_time, uint8_t ke
  * @param pulse_input_gpio_num GPIO pin number for pulse input.
  * @param pcnt_unit PCNT unit to use.
  */
-void TippingBucketCounter::begin(int16_t kept_whole_counts_last_time, uint8_t kept_overflow_counts, uint8_t pulse_input_gpio_num, pcnt_unit_t pcnt_unit)
+void TippingBucketCounter::begin(int16_t kept_whole_counts_last_time, uint8_t kept_overflow_counts, uint8_t pulse_input_gpio_num, pcnt_unit_t pcnt_unit,uint16_t pcnt_filter_value)
 {
   count_mode = MODE_PULSE_COUNTER;
   /*pin mode*/
@@ -38,9 +38,10 @@ void TippingBucketCounter::begin(int16_t kept_whole_counts_last_time, uint8_t ke
   pcnt_config.unit = pcnt_unit;
   pcnt_config.pos_mode = PCNT_COUNT_INC;
   pcnt_config.neg_mode = PCNT_COUNT_DEC;
-  pcnt_config.counter_h_lim = BUCKET_COUNTER_MAX_COUNT;
-  pcnt_config.counter_l_lim = -BUCKET_COUNTER_MAX_COUNT;
+  pcnt_config.counter_h_lim = PCNT_MAX_COUNT;
+  pcnt_config.counter_l_lim = -PCNT_MAX_COUNT;
   pcnt_unit_config(&pcnt_config);   // ユニット初期化
+  pcnt_set_filter_value(pcnt_unit, pcnt_filter_value); // フィルタ値設定
   pcnt_counter_pause(PCNT_UNIT_0);  // カウンタ一時停止
   pcnt_counter_clear(PCNT_UNIT_0);  // カウンタ初期化
   pcnt_counter_resume(PCNT_UNIT_0); // カウント開始

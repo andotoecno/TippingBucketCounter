@@ -17,7 +17,7 @@
 #define BUCKET_COUNTER_PORT_NUM_CCLR 19
 
 #define BUCKET_MAX_VOLUME_ML 50
-#define BUCKET_COUNTER_MAX_COUNT 255
+#define PCNT_MAX_COUNT 32767 // Maximum count value for PCNT
 #define NUMBER_OF_GPIO 10
 enum
 {
@@ -56,7 +56,7 @@ class TippingBucketCounter
     float total_volume = 0;
 
     void begin(int16_t , uint8_t);
-    void begin(int16_t , uint8_t, uint8_t, pcnt_unit_t);
+    void begin(int16_t , uint8_t, uint8_t, pcnt_unit_t, uint16_t pcnt_filter_value=0);
     void take_count();
     void take_count(pcnt_unit_t);
     void count_clear();
