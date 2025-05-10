@@ -104,6 +104,12 @@ void TippingBucketCounter::count_clear()
   delay(100);
   digitalWrite(_binary_counter_ports[PORT_CCK_INDEX], 0);
   pinMode(_binary_counter_ports[PORT_CCK_INDEX], INPUT);
+
+  total_volume = 0;
+  whole_counts_ = 0;
+  difference_counts = 0;
+  overflow_counts_ = 0;
+  whole_counts_last_time_ = 0;
 }
 
 /**
@@ -115,6 +121,12 @@ void TippingBucketCounter::count_clear(pcnt_unit_t pcnt_unit)
   pcnt_counter_pause(pcnt_unit);  // カウンタ一時停止
   pcnt_counter_clear(pcnt_unit);  // カウンタ初期化
   pcnt_counter_resume(pcnt_unit); // カウント開始
+
+  total_volume = 0;
+  whole_counts_ = 0;
+  difference_counts = 0;
+  overflow_counts_ = 0;
+  whole_counts_last_time_ = 0;
 }
 
 void TippingBucketCounter::calculate_volume(float bucket_volume_ml)
