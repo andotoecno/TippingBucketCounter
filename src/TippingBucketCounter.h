@@ -32,36 +32,37 @@ enum
   PORT_CCLR_INDEX,
 };
 
-enum {
+enum
+{
   MODE_BINARY_COUNTER,
   MODE_PULSE_COUNTER,
 };
 
 class TippingBucketCounter
 {
-  private:
+private:
   uint16_t i = 0;
   const int _counter_bits = 8;
   const int _number_of_GPIO = 10;
-  int count_mode = MODE_BINARY_COUNTER;
   uint8_t _binary_counter_ports[NUMBER_OF_GPIO];
   pcnt_unit_t _pcnt_unit = PCNT_UNIT_0;
-
+  
   public:
-    int16_t whole_counts_ = 0;
-    int16_t whole_counts_last_time_ = 0;
-    uint8_t overflow_counts_ = 0;
-    int16_t difference_counts = 0;
-    float volume_since_last_time = 0;
-    float total_volume = 0;
+  int count_mode = MODE_BINARY_COUNTER;
+  int16_t whole_counts_ = 0;
+  int16_t whole_counts_last_time_ = 0;
+  uint8_t overflow_counts_ = 0;
+  int16_t difference_counts = 0;
+  float volume_since_last_time = 0;
+  float total_volume = 0;
 
-    TippingBucketCounter();
-    void begin(int16_t , uint8_t);
-    void begin(int16_t , uint8_t, uint8_t, pcnt_unit_t, uint16_t pcnt_filter_value=0);
-    void take_count();
-    void count_clear();
-    void calculate_volume(float bucket_volume_ml);
-    void debug();
+  TippingBucketCounter();
+  void begin(int16_t, uint8_t);
+  void begin(int16_t, uint8_t, uint8_t, pcnt_unit_t, uint16_t pcnt_filter_value = 0);
+  void take_count();
+  void count_clear();
+  void calculate_volume(float bucket_volume_ml);
+  void debug();
 };
 
 #endif

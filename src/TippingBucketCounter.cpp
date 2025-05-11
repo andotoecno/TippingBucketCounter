@@ -46,18 +46,19 @@ void TippingBucketCounter::begin(int16_t kept_whole_counts_last_time, uint8_t ke
   count_mode = MODE_PULSE_COUNTER;
   Serial.println("Tipping Bucket Count mode: MODE_PULSE_COUNTER");
   _pcnt_unit = pcnt_unit;
+  pinMode(pulse_input_gpio_num, INPUT);
   /*pin mode*/
   pcnt_config_t pcnt_config;
   pcnt_config.pulse_gpio_num = pulse_input_gpio_num;
   pcnt_config.ctrl_gpio_num = PCNT_PIN_NOT_USED;
-  pcnt_config.lctrl_mode = PCNT_MODE_REVERSE;
+  pcnt_config.lctrl_mode = PCNT_MODE_KEEP;
   pcnt_config.hctrl_mode = PCNT_MODE_KEEP;
   pcnt_config.channel = PCNT_CHANNEL_0;
   pcnt_config.unit = pcnt_unit;
-  pcnt_config.pos_mode = PCNT_COUNT_INC;
-  pcnt_config.neg_mode = PCNT_COUNT_DEC;
+  pcnt_config.pos_mode = PCNT_COUNT_DIS;
+  pcnt_config.neg_mode = PCNT_COUNT_INC;
   pcnt_config.counter_h_lim = PCNT_MAX_COUNT;
-  pcnt_config.counter_l_lim = -PCNT_MAX_COUNT;
+  pcnt_config.counter_l_lim = 0;
   pcnt_unit_config(&pcnt_config);                      // ユニット初期化
   pcnt_set_filter_value(pcnt_unit, pcnt_filter_value); // フィルタ値設定
   pcnt_counter_pause(PCNT_UNIT_0);                     // カウンタ一時停止
@@ -73,17 +74,17 @@ void TippingBucketCounter::begin(int16_t kept_whole_counts_last_time, uint8_t ke
  */
 void TippingBucketCounter::take_count()
 {
-  if (count_mode == MODE_BINARY_COUNTER){
- 
-  whole_counts_ = 0;
-  for (i = 0; i < _counter_bits; i++)
-    whole_counts_ += digitalRead(_binary_counter_ports[i]) << i;
-
-  }else if (count_mode == MODE_PULSE_COUNTER)
+  if (count_mode == MODE_BINARY_COUNTER)
   {
-     pcnt_get_counter_value(_pcnt_unit, &whole_counts_);
+
+    whole_counts_ = 0;
+    for (i = 0; i < _counter_bits; i++)
+      whole_counts_ += digitalRead(_binary_counter_ports[i]) << i;
   }
-  
+  else if (count_mode == MODE_PULSE_COUNTER)
+  {
+    pcnt_get_counter_value(_pcnt_unit, &whole_counts_);
+  }
 
   difference_counts = whole_counts_ - whole_counts_last_time_;
 
@@ -93,7 +94,6 @@ void TippingBucketCounter::take_count()
     overflow_counts_++;
   }
   whole_counts_last_time_ = whole_counts_;
-
 }
 
 /**
@@ -103,35 +103,34 @@ void TippingBucketCounter::count_clear()
 {
   if (count_mode == MODE_BINARY_COUNTER)
   {
-   
-  pinMode(_binary_counter_ports[PORT_CCLR_INDEX], OUTPUT);
-  digitalWrite(_binary_counter_ports[PORT_CCLR_INDEX], 0);
-  delay(100);
-  digitalWrite(_binary_counter_ports[PORT_CCLR_INDEX], 1);
-  delay(100);
-  pinMode(_binary_counter_ports[PORT_CCLR_INDEX], INPUT);
 
-  pinMode(_binary_counter_ports[PORT_CCK_INDEX], OUTPUT);
-  delay(100);
-  digitalWrite(_binary_counter_ports[PORT_CCK_INDEX], 1);
-  delay(100);
-  digitalWrite(_binary_counter_ports[PORT_CCK_INDEX], 0);
-  pinMode(_binary_counter_ports[PORT_CCK_INDEX], INPUT);
+    pinMode(_binary_counter_ports[PORT_CCLR_INDEX], OUTPUT);
+    digitalWrite(_binary_counter_ports[PORT_CCLR_INDEX], 0);
+    delay(100);
+    digitalWrite(_binary_counter_ports[PORT_CCLR_INDEX], 1);
+    delay(100);
+    pinMode(_binary_counter_ports[PORT_CCLR_INDEX], INPUT);
+
+    pinMode(_binary_counter_ports[PORT_CCK_INDEX], OUTPUT);
+    delay(100);
+    digitalWrite(_binary_counter_ports[PORT_CCK_INDEX], 1);
+    delay(100);
+    digitalWrite(_binary_counter_ports[PORT_CCK_INDEX], 0);
+    pinMode(_binary_counter_ports[PORT_CCK_INDEX], INPUT);
   }
   else if (count_mode == MODE_PULSE_COUNTER)
   {
-      pcnt_counter_pause(_pcnt_unit);  // カウンタ一時停止
-  pcnt_counter_clear(_pcnt_unit);  // カウンタ初期化
-  pcnt_counter_resume(_pcnt_unit); // カウント開始
+    pcnt_counter_pause(_pcnt_unit);  // カウンタ一時停止
+    pcnt_counter_clear(_pcnt_unit);  // カウンタ初期化
+    pcnt_counter_resume(_pcnt_unit); // カウント開始
   }
-  
+
   total_volume = 0;
   whole_counts_ = 0;
   difference_counts = 0;
   overflow_counts_ = 0;
   whole_counts_last_time_ = 0;
 }
-
 
 void TippingBucketCounter::calculate_volume(float bucket_volume_ml)
 {
