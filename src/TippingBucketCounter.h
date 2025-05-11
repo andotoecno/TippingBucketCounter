@@ -46,6 +46,8 @@ private:
   const int _number_of_GPIO = 10;
   uint8_t _binary_counter_ports[NUMBER_OF_GPIO];
   pcnt_unit_t _pcnt_unit = PCNT_UNIT_0;
+  int16_t raw_pulse_counts;
+  int16_t raw_pulse_counts_last_time;
   
   public:
   int count_mode = MODE_BINARY_COUNTER;

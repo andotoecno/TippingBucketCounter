@@ -83,7 +83,12 @@ void TippingBucketCounter::take_count()
   }
   else if (count_mode == MODE_PULSE_COUNTER)
   {
-    pcnt_get_counter_value(_pcnt_unit, &whole_counts_);
+    pcnt_get_counter_value(_pcnt_unit, &raw_pulse_counts);
+    if (raw_pulse_counts != raw_pulse_counts_last_time) // count up on increased or decreased
+    {
+      whole_counts_++;
+    }
+    raw_pulse_counts_last_time = raw_pulse_counts;
   }
 
   difference_counts = whole_counts_ - whole_counts_last_time_;
@@ -140,6 +145,8 @@ void TippingBucketCounter::calculate_volume(float bucket_volume_ml)
 
 void TippingBucketCounter::debug()
 {
+  String str_buf = "";
+
   if (count_mode == MODE_BINARY_COUNTER)
   {
     Serial.println("Count mode: MODE_BINARY_COUNTER");
@@ -168,9 +175,10 @@ void TippingBucketCounter::debug()
   else if (count_mode == MODE_PULSE_COUNTER)
   {
     Serial.println("Count mode: MODE_PULSE_COUNTER");
+    str_buf = ("  Raw Pulse Counts: " + String(raw_pulse_counts));
+    Serial.println(str_buf);
   }
 
-  String str_buf = "";
   Serial.println("--- Counts ---");
   str_buf = ("  Whole Counts: " + String(whole_counts_));
   Serial.println(str_buf);
