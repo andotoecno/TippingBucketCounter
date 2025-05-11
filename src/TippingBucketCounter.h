@@ -4,17 +4,16 @@
 #include <Arduino.h>
 #include "driver/pcnt.h"
 
-//ver3.0
-#define BUCKET_COUNTER_PORT_NUM_A 14
-#define BUCKET_COUNTER_PORT_NUM_B 15
-#define BUCKET_COUNTER_PORT_NUM_C 4
-#define BUCKET_COUNTER_PORT_NUM_D 16
-#define BUCKET_COUNTER_PORT_NUM_E 17
-#define BUCKET_COUNTER_PORT_NUM_F 5
-#define BUCKET_COUNTER_PORT_NUM_G 18
-#define BUCKET_COUNTER_PORT_NUM_H 36
-#define BUCKET_COUNTER_PORT_NUM_CCK 27
-#define BUCKET_COUNTER_PORT_NUM_CCLR 19
+extern const uint8_t BUCKET_COUNTER_BINARY_PORT_NUM_A;
+extern const uint8_t BUCKET_COUNTER_BINARY_PORT_NUM_B;
+extern const uint8_t BUCKET_COUNTER_BINARY_PORT_NUM_C;
+extern const uint8_t BUCKET_COUNTER_BINARY_PORT_NUM_D;
+extern const uint8_t BUCKET_COUNTER_BINARY_PORT_NUM_E;
+extern const uint8_t BUCKET_COUNTER_BINARY_PORT_NUM_F;
+extern const uint8_t BUCKET_COUNTER_BINARY_PORT_NUM_G;
+extern const uint8_t BUCKET_COUNTER_BINARY_PORT_NUM_H;
+extern const uint8_t BUCKET_COUNTER_BINARY_PORT_NUM_CCK;
+extern const uint8_t BUCKET_COUNTER_BINARY_PORT_NUM_CCLR;
 
 #define BUCKET_MAX_VOLUME_ML 50
 #define PCNT_MAX_COUNT 32767 // Maximum count value for PCNT
@@ -45,7 +44,8 @@ class TippingBucketCounter
   const int _counter_bits = 8;
   const int _number_of_GPIO = 10;
   int count_mode = MODE_BINARY_COUNTER;
-  uint8_t _binary_counter_ports[NUMBER_OF_GPIO] = {BUCKET_COUNTER_PORT_NUM_A, BUCKET_COUNTER_PORT_NUM_B, BUCKET_COUNTER_PORT_NUM_C, BUCKET_COUNTER_PORT_NUM_D, BUCKET_COUNTER_PORT_NUM_E, BUCKET_COUNTER_PORT_NUM_F, BUCKET_COUNTER_PORT_NUM_G, BUCKET_COUNTER_PORT_NUM_H, BUCKET_COUNTER_PORT_NUM_CCK, BUCKET_COUNTER_PORT_NUM_CCLR};
+  uint8_t _binary_counter_ports[NUMBER_OF_GPIO];
+  pcnt_unit_t _pcnt_unit = PCNT_UNIT_0;
 
   public:
     int16_t whole_counts_ = 0;
@@ -55,12 +55,11 @@ class TippingBucketCounter
     float volume_since_last_time = 0;
     float total_volume = 0;
 
+    TippingBucketCounter();
     void begin(int16_t , uint8_t);
     void begin(int16_t , uint8_t, uint8_t, pcnt_unit_t, uint16_t pcnt_filter_value=0);
     void take_count();
-    void take_count(pcnt_unit_t);
     void count_clear();
-    void count_clear(pcnt_unit_t);
     void calculate_volume(float bucket_volume_ml);
     void debug();
 };

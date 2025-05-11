@@ -1,5 +1,20 @@
 #include "TippingBucketCounter.h"
-
+/**
+ * @brief Construct a new Tipping Bucket Counter:: Tipping Bucket Counter object
+ */
+TippingBucketCounter::TippingBucketCounter()
+{
+  _binary_counter_ports[PORT_A_INDEX] = BUCKET_COUNTER_BINARY_PORT_NUM_A;
+  _binary_counter_ports[PORT_B_INDEX] = BUCKET_COUNTER_BINARY_PORT_NUM_B;
+  _binary_counter_ports[PORT_C_INDEX] = BUCKET_COUNTER_BINARY_PORT_NUM_C;
+  _binary_counter_ports[PORT_D_INDEX] = BUCKET_COUNTER_BINARY_PORT_NUM_D;
+  _binary_counter_ports[PORT_E_INDEX] = BUCKET_COUNTER_BINARY_PORT_NUM_E;
+  _binary_counter_ports[PORT_F_INDEX] = BUCKET_COUNTER_BINARY_PORT_NUM_F;
+  _binary_counter_ports[PORT_G_INDEX] = BUCKET_COUNTER_BINARY_PORT_NUM_G;
+  _binary_counter_ports[PORT_H_INDEX] = BUCKET_COUNTER_BINARY_PORT_NUM_H;
+  _binary_counter_ports[PORT_CCK_INDEX] = BUCKET_COUNTER_BINARY_PORT_NUM_CCK;
+  _binary_counter_ports[PORT_CCLR_INDEX] = BUCKET_COUNTER_BINARY_PORT_NUM_CCLR;
+}
 /**
  * @brief Initialize the Tipping Bucket Counter using direct GPIO reading.
  * @param kept_whole_counts_last_time The last saved whole count value.
@@ -8,6 +23,7 @@
 void TippingBucketCounter::begin(int16_t kept_whole_counts_last_time, uint8_t kept_overflow_counts)
 {
   count_mode = MODE_BINARY_COUNTER;
+  Serial.println("Tipping Bucket Count mode: MODE_BINARY_COUNTER");
   /*pin mode*/
   for (uint16_t i = 0; i < _counter_bits; i++)
     pinMode(_binary_counter_ports[i], INPUT);
@@ -28,6 +44,8 @@ void TippingBucketCounter::begin(int16_t kept_whole_counts_last_time, uint8_t ke
 void TippingBucketCounter::begin(int16_t kept_whole_counts_last_time, uint8_t kept_overflow_counts, uint8_t pulse_input_gpio_num, pcnt_unit_t pcnt_unit, uint16_t pcnt_filter_value)
 {
   count_mode = MODE_PULSE_COUNTER;
+  Serial.println("Tipping Bucket Count mode: MODE_PULSE_COUNTER");
+  _pcnt_unit = pcnt_unit;
   /*pin mode*/
   pcnt_config_t pcnt_config;
   pcnt_config.pulse_gpio_num = pulse_input_gpio_num;
@@ -55,16 +73,18 @@ void TippingBucketCounter::begin(int16_t kept_whole_counts_last_time, uint8_t ke
  */
 void TippingBucketCounter::take_count()
 {
-  if (count_mode != MODE_BINARY_COUNTER)
-  {
-    Serial.println("Error: BucketCounter Mode Mismatch between initialization (Pulse) and execution (Binary).");
-    return;
-  }
-
+  if (count_mode == MODE_BINARY_COUNTER){
+ 
   whole_counts_ = 0;
   for (i = 0; i < _counter_bits; i++)
     whole_counts_ += digitalRead(_binary_counter_ports[i]) << i;
 
+  }else if (count_mode == MODE_PULSE_COUNTER)
+  {
+     pcnt_get_counter_value(_pcnt_unit, &whole_counts_);
+  }
+  
+
   difference_counts = whole_counts_ - whole_counts_last_time_;
 
   if (difference_counts < 0)
@@ -73,29 +93,7 @@ void TippingBucketCounter::take_count()
     overflow_counts_++;
   }
   whole_counts_last_time_ = whole_counts_;
-}
 
-/**
- * @brief Take the current count using the ESP32 PCNT peripheral.
- * @param pcnt_unit PCNT unit to read from.
- */
-void TippingBucketCounter::take_count(pcnt_unit_t pcnt_unit)
-{
-  if (count_mode != MODE_PULSE_COUNTER)
-  {
-    Serial.println("Error: BucketCounter Mode Mismatch between initialization (Binary) and execution (Pulse).");
-    return;
-  }
-
-  pcnt_get_counter_value(pcnt_unit, &whole_counts_);
-  difference_counts = whole_counts_ - whole_counts_last_time_;
-
-  if (difference_counts < 0)
-  {
-    difference_counts += 256; /*not 255 because next count of 255 is 0(not 1)*/
-    overflow_counts_++;
-  }
-  whole_counts_last_time_ = whole_counts_;
 }
 
 /**
@@ -103,12 +101,9 @@ void TippingBucketCounter::take_count(pcnt_unit_t pcnt_unit)
  */
 void TippingBucketCounter::count_clear()
 {
-  if (count_mode != MODE_BINARY_COUNTER)
+  if (count_mode == MODE_BINARY_COUNTER)
   {
-    Serial.println("Error: BucketCounter Mode Mismatch between initialization (Pulse) and execution (Binary).");
-    return;
-  }
-
+   
   pinMode(_binary_counter_ports[PORT_CCLR_INDEX], OUTPUT);
   digitalWrite(_binary_counter_ports[PORT_CCLR_INDEX], 0);
   delay(100);
@@ -122,36 +117,21 @@ void TippingBucketCounter::count_clear()
   delay(100);
   digitalWrite(_binary_counter_ports[PORT_CCK_INDEX], 0);
   pinMode(_binary_counter_ports[PORT_CCK_INDEX], INPUT);
-
-  total_volume = 0;
-  whole_counts_ = 0;
-  difference_counts = 0;
-  overflow_counts_ = 0;
-  whole_counts_last_time_ = 0;
-}
-
-/**
- * @brief Clear the ESP32 PCNT counter.
- * @param pcnt_unit PCNT unit to clear.
- */
-void TippingBucketCounter::count_clear(pcnt_unit_t pcnt_unit)
-{
-  if (count_mode != MODE_PULSE_COUNTER)
-  {
-    Serial.println("Error: BucketCounter Mode Mismatch between initialization (Binary) and execution (Pulse).");
-    return;
   }
-
-  pcnt_counter_pause(pcnt_unit);  // カウンタ一時停止
-  pcnt_counter_clear(pcnt_unit);  // カウンタ初期化
-  pcnt_counter_resume(pcnt_unit); // カウント開始
-
+  else if (count_mode == MODE_PULSE_COUNTER)
+  {
+      pcnt_counter_pause(_pcnt_unit);  // カウンタ一時停止
+  pcnt_counter_clear(_pcnt_unit);  // カウンタ初期化
+  pcnt_counter_resume(_pcnt_unit); // カウント開始
+  }
+  
   total_volume = 0;
   whole_counts_ = 0;
   difference_counts = 0;
   overflow_counts_ = 0;
   whole_counts_last_time_ = 0;
 }
+
 
 void TippingBucketCounter::calculate_volume(float bucket_volume_ml)
 {
