@@ -60,7 +60,7 @@ private:
 
   TippingBucketCounter();
   void begin(int16_t, uint8_t);
-  void begin(int16_t, uint8_t, uint8_t, pcnt_unit_t, uint16_t pcnt_filter_value = 0);
+  void begin(int16_t, uint8_t, uint8_t, pcnt_unit_t, uint16_t pcnt_filter_value = UINT16_MAX);
   void take_count();
   void count_clear();
   void calculate_volume(float bucket_volume_ml);
